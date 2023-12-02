@@ -1,5 +1,6 @@
 import time
 from typing import Tuple
+from tqdm import tqdm
 
 import numpy as np
 import regex as re
@@ -40,8 +41,8 @@ if __name__ == "__main__":
     with open("input.txt") as f:
         data = f.read().splitlines()
     times = []
-    n_trials = 100
-    for trial in range(n_trials):
+    n_trials = 5
+    for trial in tqdm(range(n_trials)):
         start = time.time()
         part_1, part_2 = main(data)
         end = time.time()
@@ -49,5 +50,5 @@ if __name__ == "__main__":
     print("Part 1: ", part_1)
     print("Part 2: ", part_2)
     print(
-        f"After {n_trials} trials, elapsed time (s): {np.mean(times):.4f} +/- {np.std(times):.4f}"
+        f"After {n_trials} trials, average time (s): {np.mean(times):.4f} +/- {np.std(times):.4f}"
     )
