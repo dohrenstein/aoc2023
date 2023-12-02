@@ -35,10 +35,10 @@ def main(data: list) -> Tuple[int, int]:
 
 
 if __name__ == "__main__":
-    with open("input.txt") as f:
+    with open("day01_big_input.txt") as f:
         data = f.read().splitlines()
     times = []
-    n_trials = 100
+    n_trials = 5
     for trial in range(n_trials):
         start = time.time()
         part_1, part_2 = main(data)
