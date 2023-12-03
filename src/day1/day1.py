@@ -1,9 +1,9 @@
 import time
 from typing import Tuple
-from tqdm import tqdm
 
 import numpy as np
 import regex as re
+from tqdm import tqdm
 
 
 def main(data: list) -> Tuple[int, int]:
