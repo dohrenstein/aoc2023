@@ -20,12 +20,10 @@ def main(data: list) -> Tuple[int, int]:
         if len(n_matches) >= 1:
             part_1 += 2 ** (len(n_matches) - 1)
 
-    part_2_num_cards = [1] * len(data)
+    part_2_num_cards = np.array([1] * len(data), dtype="int64")
     for card in range(len(part_2_num_cards)):
         n_matches = list_matches[card]
-        for copy in range(part_2_num_cards[card]):
-            for match in range(n_matches):
-                part_2_num_cards[card + 1 + match] += 1
+        part_2_num_cards[card + 1 : card + 1 + n_matches] += part_2_num_cards[card]
 
     part_2 = sum(part_2_num_cards)
 
