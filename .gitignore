@@ -1,6 +1,5 @@
 # ignore data
-src/*/*.txt
-src/*/*.zip
+data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

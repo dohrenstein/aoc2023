@@ -1,3 +1,9 @@
 numpy
 pandas
 regex
+tqdm
+requests
+browser-cookie3
+
+# dev
+pre-commit
