@@ -60,9 +60,7 @@ def _get_input_data(day: int, big_data: bool, sample_data: bool) -> list:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="AOC 2023", description="Runs Daniel Ohrenstein's solutions for AOC 2023"
-    )
+    parser = argparse.ArgumentParser(prog="AOC 2023")
     parser.add_argument(
         "-t", "--trials", help="How many times to run the solution", type=int, default=5
     )
