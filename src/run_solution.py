@@ -2,35 +2,56 @@ import argparse
 import time
 from pathlib import Path
 
-import browser_cookie3
 import numpy as np
-import requests
 from tqdm import tqdm
+
+import utils
 
 main_dict = {}
 for day in range(1, 26):
-    if Path(f"src/day{day}.py").exists():
-        exec(f"from day{day} import main as day{day}", globals())
-        main_dict[day] = eval(f"day{day}")
+    try:
+        exec(f"import day{day}", globals())
+        main_dict[day] = eval(f"day{day}").Solution()
+    except ImportError:
+        main_dict[day] = utils.NotCompleteSolution()
 
 
 def _run_solution(day: int, trials: int, big_data: bool, sample_data: bool):
     print(f"Day {day}:")
-    if day not in main_dict:
-        print(f"  - Solution for day {day} does not exist!")
-    else:
+    try:
         data = _get_input_data(day=day, big_data=big_data, sample_data=sample_data)
-        print(f"  - Running day {day} solution {trials} times...")
-        times = []
+    except ValueError as exp:
+        print(f"  - {exp}")
+        return
+
+    print(f"  - Running day {day} solution {trials} times...")
+    solution = main_dict[day]
+
+    try:
+        part_1_times = []
         for _ in tqdm(range(trials), leave=False):
             start = time.time()
-            part_1, part_2 = main_dict[day](data.copy())
+            part_1 = solution.part_1(data.copy())
             end = time.time()
-            times.append(end - start)
-        print("  - Part 1: ", part_1, "Part 2: ", part_2)
+            part_1_times.append(end - start)
         print(
-            f"  - Complete! After {trials} trials, average time (s): {np.mean(times):.4f} +/- {np.std(times):.4f}"
+            f"  - Part 1: {part_1} Average time (s): {np.mean(part_1_times):.4f} +/- {np.std(part_1_times):.4f}"
         )
+    except NotImplementedError:
+        print(f"  - Part 1: solution for day {day} does not exist!")
+
+    try:
+        part_2_times = []
+        for _ in tqdm(range(trials), leave=False):
+            start = time.time()
+            part_2 = solution.part_2(data.copy())
+            end = time.time()
+            part_2_times.append(end - start)
+        print(
+            f"  - Part 2: {part_2} Average time (s): {np.mean(part_2_times):.4f} +/- {np.std(part_2_times):.4f}"
+        )
+    except NotImplementedError:
+        print(f"  - Part 2: solution for day {day} does not exist!")
 
 
 def _get_input_data(day: int, big_data: bool, sample_data: bool) -> list:
