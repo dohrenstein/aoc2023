@@ -1,3 +1,5 @@
+from typing import Callable
+
 import pandas as pd
 
 from utils import BaseSolution
@@ -69,43 +71,26 @@ def _get_part_2_strength(hand: str):
     return _get_hand_type(card_counts)
 
 
+def _calculate_winnings(data: list, strength_func: Callable, card_order_func: Callable):
+    # each row of data contains a hand and a bid e.g. "32T3K 765"
+    # convert data into a dataframe containing two columns named "hand" and "bid"
+    # each row of the dataframe contains a hand and a bid e.g. "32T3K" and "765"
+    df_hands = pd.DataFrame([hand.split(" ") for hand in data], columns=["hand", "bid"])
+    df_hands["strength"] = df_hands["hand"].apply(strength_func)
+    for i in range(5):
+        df_hands[f"card_{i}_score"] = df_hands["hand"].str[i].apply(card_order_func)
+
+    df_hands = df_hands.sort_values(
+        ["strength"] + [f"card_{i}_score" for i in range(5)], ascending=False
+    )
+    df_hands["rank"] = range(1, len(df_hands) + 1)
+    df_hands["winnings"] = df_hands["rank"] * df_hands["bid"].astype(int)
+    return df_hands["winnings"].sum()
+
+
 class Solution(BaseSolution):
     def part_1(self, data: list) -> int:
-        # each row of data contains a hand and a bid e.g. "32T3K 765"
-        # convert data into a dataframe containing two columns named "hand" and "bid"
-        # each row of the dataframe contains a hand and a bid e.g. "32T3K" and "765"
-        df_hands = pd.DataFrame(
-            [hand.split(" ") for hand in data], columns=["hand", "bid"]
-        )
-        df_hands["strength"] = df_hands["hand"].apply(_get_part_1_strength)
-        for i in range(5):
-            df_hands[f"card_{i}_score"] = (
-                df_hands["hand"].str[i].apply(_part_1_card_order)
-            )
-
-        df_hands = df_hands.sort_values(
-            ["strength"] + [f"card_{i}_score" for i in range(5)], ascending=False
-        )
-        df_hands["rank"] = range(1, len(df_hands) + 1)
-        df_hands["winnings"] = df_hands["rank"] * df_hands["bid"].astype(int)
-        return df_hands["winnings"].sum()
+        return _calculate_winnings(data, _get_part_1_strength, _part_1_card_order)
 
     def part_2(self, data: list) -> int:
-        # each row of data contains a hand and a bid e.g. "32T3K 765"
-        # convert data into a dataframe containing two columns named "hand" and "bid"
-        # each row of the dataframe contains a hand and a bid e.g. "32T3K" and "765"
-        df_hands = pd.DataFrame(
-            [hand.split(" ") for hand in data], columns=["hand", "bid"]
-        )
-        df_hands["strength"] = df_hands["hand"].apply(_get_part_2_strength)
-        for i in range(5):
-            df_hands[f"card_{i}_score"] = (
-                df_hands["hand"].str[i].apply(_part_2_card_order)
-            )
-
-        df_hands = df_hands.sort_values(
-            ["strength"] + [f"card_{i}_score" for i in range(5)], ascending=False
-        )
-        df_hands["rank"] = range(1, len(df_hands) + 1)
-        df_hands["winnings"] = df_hands["rank"] * df_hands["bid"].astype(int)
-        return df_hands["winnings"].sum()
+        return _calculate_winnings(data, _get_part_2_strength, _part_2_card_order)
