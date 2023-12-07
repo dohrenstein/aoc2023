@@ -1,28 +1,32 @@
-from typing import Callable
+from typing import Callable, Iterable
 
 import pandas as pd
 
 from utils import BaseSolution
+
+part_1_card_order = ["A", "K", "Q", "J", "T"] + [str(i) for i in range(9, 1, -1)]
+part_2_card_order = ["A", "K", "Q", "T"] + [str(i) for i in range(9, 1, -1)] + ["J"]
 
 
 def _get_hand_type(card_counts):
     """
     Lower = Better
     """
-    if max(card_counts.values()) == 5:
+    max_card_cound = max(card_counts.values())
+    if max_card_cound == 5:
         # Five of a kind
         return 0
-    elif max(card_counts.values()) == 4:
+    elif max_card_cound == 4:
         # Four of a kind
         return 1
-    elif max(card_counts.values()) == 3:
+    elif max_card_cound == 3:
         if 2 in card_counts.values():
             # Full house
             return 2
         else:
             # Three of a kind
             return 3
-    elif max(card_counts.values()) == 2:
+    elif max_card_cound == 2:
         if sum(value == 2 for value in card_counts.values()) == 2:
             # Two pair
             return 4
@@ -39,16 +43,6 @@ def _get_card_counts(hand: str):
     for card in hand:
         card_counts[card] = card_counts.get(card, 0) + 1
     return card_counts
-
-
-def _part_1_card_order(card: str):
-    return (["A", "K", "Q", "J", "T"] + [str(i) for i in range(9, 1, -1)]).index(card)
-
-
-def _part_2_card_order(card: str):
-    return (["A", "K", "Q", "T"] + [str(i) for i in range(9, 1, -1)] + ["J"]).index(
-        card
-    )
 
 
 def _get_part_1_strength(hand: str):
@@ -71,14 +65,16 @@ def _get_part_2_strength(hand: str):
     return _get_hand_type(card_counts)
 
 
-def _calculate_winnings(data: list, strength_func: Callable, card_order_func: Callable):
+def _calculate_winnings(data: list, strength_func: Callable, card_order: list):
     # each row of data contains a hand and a bid e.g. "32T3K 765"
     # convert data into a dataframe containing two columns named "hand" and "bid"
     # each row of the dataframe contains a hand and a bid e.g. "32T3K" and "765"
     df_hands = pd.DataFrame([hand.split(" ") for hand in data], columns=["hand", "bid"])
     df_hands["strength"] = df_hands["hand"].apply(strength_func)
     for i in range(5):
-        df_hands[f"card_{i}_score"] = df_hands["hand"].str[i].apply(card_order_func)
+        df_hands[f"card_{i}_score"] = (
+            df_hands["hand"].str[i].apply(lambda card: card_order.index(card))
+        )
 
     df_hands = df_hands.sort_values(
         ["strength"] + [f"card_{i}_score" for i in range(5)], ascending=False
@@ -90,7 +86,7 @@ def _calculate_winnings(data: list, strength_func: Callable, card_order_func: Ca
 
 class Solution(BaseSolution):
     def part_1(self, data: list) -> int:
-        return _calculate_winnings(data, _get_part_1_strength, _part_1_card_order)
+        return _calculate_winnings(data, _get_part_1_strength, part_1_card_order)
 
     def part_2(self, data: list) -> int:
-        return _calculate_winnings(data, _get_part_2_strength, _part_2_card_order)
+        return _calculate_winnings(data, _get_part_2_strength, part_2_card_order)
